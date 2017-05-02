@@ -1,5 +1,5 @@
 {
-    "name": "espier/api",
+    "name": "onex/espier-api",
     "description": "A RESTful API package for the Laravel and Lumen frameworks.",
     "keywords": [
         "api",
