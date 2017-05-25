@@ -24,9 +24,9 @@ class EspierServiceProvider extends DingoServiceProvider
     {
         parent::boot();
 
-        $this->app->configure('api');
+        //$this->app->configure('api');
 
-        $reflection = new ReflectionClass($this->app);
+        //$reflection = new ReflectionClass($this->app);
 
         /** 
          * $this->app[Request::class]->mergeMiddlewares(
@@ -39,16 +39,19 @@ class EspierServiceProvider extends DingoServiceProvider
         // Because Lumen sets the route resolver at a very weird point we're going to
         // have to use reflection whenever the request instance is rebound to
         // set the route resolver to get the current route.
-        $this->app->rebinding(IlluminateRequest::class, function ($app, $request) {
-            $request->setRouteResolver(function () use ($app) {
-                $reflection = new ReflectionClass($app);
 
-                $property = $reflection->getProperty('currentRoute');
-                $property->setAccessible(true);
-
-                return $property->getValue($app);
-            });
-        });
+        /** 
+         * $this->app->rebinding(IlluminateRequest::class, function ($app, $request) {
+         *     $request->setRouteResolver(function () use ($app) {
+         *         $reflection = new ReflectionClass($app);
+         * 
+         *         $property = $reflection->getProperty('currentRoute');
+         *         $property->setAccessible(true);
+         * 
+         *         return $property->getValue($app);
+         *     });
+         * });
+         */
 
         $this->app->routeMiddleware([
             'api.auth' => Auth::class,
@@ -66,7 +69,7 @@ class EspierServiceProvider extends DingoServiceProvider
     {
         $this->app->configure('api');
 
-        parent::setupConfig();
+        //parent::setupConfig();
     }
 
     /**
@@ -76,6 +79,7 @@ class EspierServiceProvider extends DingoServiceProvider
      */
     public function register()
     {
+        $this->setupConfig();
         parent::register();
 
         $this->app->singleton('api.router.adapter', function ($app) {

@@ -16,6 +16,8 @@ use Illuminate\Events\Dispatcher as EventDispatcher;
 use Dingo\Api\Contract\Http\Request as RequestContract;
 use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 
+use Illuminate\Http\Request as illuminateRequest;
+    
 class Request
 {
     /**
@@ -120,7 +122,7 @@ class Request
      */
     protected function sendRequestThroughRouter(HttpRequest $request)
     {
-        $this->app->instance('request', $request);
+        $this->app->instance(illuminateRequest::class, $request);
 
         return (new Pipeline($this->app))->send($request)->through($this->middleware)->then(function ($request) {
             return $this->router->dispatch($request);
