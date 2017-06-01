@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Dingo\Api\Transformer\Factory as TransformerFactory;
 use Illuminate\Contracts\Pagination\Paginator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use League\Fractal\Manager;
 
 class Factory
 {
@@ -276,6 +277,11 @@ class Factory
         // in here and return the new binding. Gross. This is now DEPRECATED and
         // should not be used. Just return an array or a new response instance.
         } elseif ($method == 'array') {
+            $manager = app(Manager::class);
+            // 让array支持 简单扩展
+            if (method_exists($manager->getSerializer(), 'array')) {
+                return new Response($manager->getSerializer()->array(null, $parameters[0]));
+            }
             return new Response($parameters[0]);
         }
 
