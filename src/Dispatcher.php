@@ -533,6 +533,8 @@ class Dispatcher
     {
         $this->routeStack[] = $this->router->getCurrentRoute();
 
+        $this->routeInfoStack[] = $this->requestStack[0]->route();
+
         $this->clearCachedFacadeInstance();
 
         try {
@@ -576,6 +578,10 @@ class Dispatcher
         if ($route = array_pop($this->routeStack)) {
             $this->router->setCurrentRoute($route);
         }
+        
+        if ($routeInfo = array_pop($this->routeInfoStack)) {
+            app()->currentRoute = $routeInfo;
+        }
 
         $this->replaceRequestInstance();
 
@@ -596,7 +602,6 @@ class Dispatcher
     protected function replaceRequestInstance()
     {
         array_pop($this->requestStack);
-
         $this->container->instance('request', end($this->requestStack));
     }
 
