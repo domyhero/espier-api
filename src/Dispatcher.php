@@ -532,7 +532,7 @@ class Dispatcher
     protected function dispatch(InternalRequest $request)
     {
         $this->routeStack[] = $this->router->getCurrentRoute();
-
+        // 解决内部调用时永远 返回第一次内部调用的数据, 原因是app的currentRoute没有入栈处理
         $this->routeInfoStack[] = $this->requestStack[0]->route();
 
         $this->clearCachedFacadeInstance();
