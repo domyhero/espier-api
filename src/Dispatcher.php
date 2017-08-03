@@ -539,6 +539,7 @@ class Dispatcher
 
         try {
             $this->container->instance('request', $request);
+            $this->container->alias('request', \Illuminate\Http\Request::class);
 
             $response = $this->router->dispatch($request);
 
@@ -577,13 +578,27 @@ class Dispatcher
 
         if ($route = array_pop($this->routeStack)) {
             $this->router->setCurrentRoute($route);
+            // 从route中获取  routeinfo 
+            $routeInfo = $route->getOriginalRoute();
         }
         
-        if ($routeInfo = array_pop($this->routeInfoStack)) {
-            app()->currentRoute = $routeInfo;
+        $this->replaceRequestInstance();
+
+        // 如果有 $routeInfo, 那么重置 routesRequests的 currentRoute
+        if (isset($routeInfo)) {
+            app('request')->setRouteResolver(function() use ($routeInfo){
+                return $routeInfo;
+            });
         }
 
-        $this->replaceRequestInstance();
+        /** 
+         * if ($routeInfo = array_pop($this->routeInfoStack)) {
+         *     //                        app()->currentRoute = $routeInfo;
+         *     app('request')->setRouteResolver(function() use ($routeInfo){
+         *         return $routeInfo;
+         *     });
+         * }
+         */
 
         $this->clearCachedFacadeInstance();
 
@@ -603,6 +618,7 @@ class Dispatcher
     {
         array_pop($this->requestStack);
         $this->container->instance('request', end($this->requestStack));
+        $this->container->alias('request', \Illuminate\Http\Request::class);
     }
 
     /**
