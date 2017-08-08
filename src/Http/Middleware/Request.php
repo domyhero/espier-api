@@ -122,7 +122,7 @@ class Request
      */
     protected function sendRequestThroughRouter(HttpRequest $request)
     {
-        $this->app->instance('request', $request);
+        $this->app->instance(illuminateRequest::class, $request);
 
         return (new Pipeline($this->app))->send($request)->through($this->middleware)->then(function ($request) {
             return $this->router->dispatch($request);

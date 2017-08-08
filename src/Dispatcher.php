@@ -6,6 +6,7 @@ use Dingo\Api\Auth\Auth;
 use Dingo\Api\Routing\Router;
 use Illuminate\Container\Container;
 use Dingo\Api\Http\InternalRequest;
+use Illuminate\Http\Request as IlluminateRequest;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Cookie;
 use Dingo\Api\Exception\InternalHttpException;
@@ -532,14 +533,11 @@ class Dispatcher
     protected function dispatch(InternalRequest $request)
     {
         $this->routeStack[] = $this->router->getCurrentRoute();
-        // 解决内部调用时永远 返回第一次内部调用的数据, 原因是app的currentRoute没有入栈处理
-        $this->routeInfoStack[] = $this->requestStack[0]->route();
 
         $this->clearCachedFacadeInstance();
 
         try {
-            $this->container->instance('request', $request);
-            $this->container->alias('request', \Illuminate\Http\Request::class);
+            $this->container->instance(IlluminateRequest::class, $request);
 
             $response = $this->router->dispatch($request);
 
@@ -617,8 +615,7 @@ class Dispatcher
     protected function replaceRequestInstance()
     {
         array_pop($this->requestStack);
-        $this->container->instance('request', end($this->requestStack));
-        $this->container->alias('request', \Illuminate\Http\Request::class);
+        $this->container->instance(IlluminateRequest::class, end($this->requestStack));
     }
 
     /**
